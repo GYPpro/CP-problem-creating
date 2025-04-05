@@ -175,12 +175,12 @@ void input(lin &a) {
 dot mirr(lin m,dot a) {
     F A = m.fi.y - m.se.y;
     F B = m.se.x - m.fi.x;
-    F C = m.fi.x * m.se.y - m.se.x + m.fi.y;
+    F C = m.fi.x * m.se.y - m.se.x * m.fi.y;
     F t = (A * a.x + B * a.y + C)/(A * A + B * B);
     t = -t;
     F xm = a.x + A * t;
     F ym = a.y + B * t;
-    return {xm*F(2)-a.x,ym * F(2)-a.y};
+    return { xm * F(2) - a.x , ym * F(2) - a.y};
 }
 
 bool onLeft(dot p,lin vec) {
@@ -194,7 +194,7 @@ bool inside(lin vec1,lin vec2,dot p) {
 lin ext(lin lc) {
     auto vec = dsc(lc.fi,lc.se);
     vec = {vec.fi * (1e9),vec.se * (1e9)};
-    return {dsc(lc.fi,vec),add(lc.se,vec)};
+    return {add(lc.fi,vec),dsc(lc.se,vec)};
 }
 
 bool ifAvil(lin vec1,lin vec2,lin seg) {
@@ -211,6 +211,7 @@ void solve()
     vector<int> p(3);
     iota(all(p),1);
     do{
+        for(auto tx:p) cout << tx << " ";cout << "\n";
         lin m0 = as[p[0]-1];
         lin m1 = as[p[1]-1];
         lin m2 = as[p[2]-1];
@@ -233,9 +234,34 @@ void solve()
             ifAvil(t3, t4, m2)
         ) {
             cout << "Yes\n";
-        } else cout << "No\n";
-
+            return;
+        }
     } while(next_permutation(all(p)));
+    cout << "No\n";
+}
+
+void test_mirr(){ //passed
+    lin a;
+    input(a);
+    dot p;
+    int fx,fy;
+    cin >> fx >> fy;
+    p = {F(fx),F(fy)};
+    // cin >> p.x >> p.y;
+    auto [tx,ty] = mirr(a,p);
+    cout << tx << " " << ty << "\n";
+}
+
+void test_ext(){
+    lin a;
+    input(a);
+    auto [f,s] = ext(a);
+    cout << f.x << " " << f.y << "\n";
+    cout << s.x << " " << s.y << "\n";
+    // lin a;
+    // input(a);
+    // auto [tx,ty] = ext(a).fi;
+    // cout << tx << " " << ty << "\n";
 }
 
 signed main()
@@ -252,5 +278,6 @@ signed main()
     int T = 1;
     cin >> T;
     while(T--) solve();
+    // while(T--) test_ext();
     return 0;
 }
