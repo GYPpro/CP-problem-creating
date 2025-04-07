@@ -32,27 +32,36 @@ struct Frac {
             num = -num;
         }
     }
+    void reduce() {
+        T g = std::gcd(num, den);
+        num /= g;
+        den /= g;
+    }
     Frac() : Frac(0, 1) {}
     Frac(T num_) : Frac(num_, 1) {}
     explicit operator double() const {
         return 1. * num / den;
     }
     Frac &operator+=(const Frac &rhs) {
+        this->reduce();
         num = num * rhs.den + rhs.num * den;
         den *= rhs.den;
         return *this;
     }
     Frac &operator-=(const Frac &rhs) {
+        this->reduce();
         num = num * rhs.den - rhs.num * den;
         den *= rhs.den;
         return *this;
     }
     Frac &operator*=(const Frac &rhs) {
+        this->reduce();
         num *= rhs.num;
         den *= rhs.den;
         return *this;
     }
     Frac &operator/=(const Frac &rhs) {
+        this->reduce();
         num *= rhs.den;
         den *= rhs.num;
         if (den < 0) {
@@ -188,20 +197,27 @@ bool onLeft(dot p,lin vec) {
 }
 
 bool inside(lin vec1,lin vec2,dot p) {
-    return onLeft(p, vec1) ^ onLeft(p, vec2);
+    if(onLeft(vec2.se,vec1)) swap(vec1,vec2);
+    // v1在v2的左边
+    return onLeft(p,vec2) && ((!onLeft(p,vec1)) && !onseg(vec1,p));
 }
 
 lin ext(lin lc) {
     auto vec = dsc(lc.fi,lc.se);
     vec = {vec.fi * (1e9),vec.se * (1e9)};
-    return {add(lc.fi,vec),dsc(lc.se,vec)};
+    return {lc.se,dsc(lc.se,vec)};
 }
 
 bool ifAvil(lin vec1,lin vec2,lin seg) {
-    if(inside(vec1, vec2, seg.fi) || inside(vec1,  vec2, seg.se)) return 1;
+    if(inside(vec1, vec2, seg.fi) || inside(vec1, vec2, seg.se)) return 1;
     if(segIntTest(ext(vec1), seg) || segIntTest(ext(vec2), seg)) return 1;
     return 0;
     // if(segIntTest( a, lin b))
+}
+
+bool ifFstl(lin vec1,lin vec2,lin seg) {
+    if(inside(vec1, vec2, seg.fi) && inside(vec1, vec2, seg.se)) return 1;
+
 }
 
 void solve()
@@ -211,28 +227,44 @@ void solve()
     vector<int> p(3);
     iota(all(p),1);
     do{
-        for(auto tx:p) cout << tx << " ";cout << "\n";
+        for(auto tx:p) cout << tx << " ";cout << "\n====\n";
         lin m0 = as[p[0]-1];
         lin m1 = as[p[1]-1];
         lin m2 = as[p[2]-1];
 
-        m2 = {mirr(m1,m2.fi),mirr(m1,m2.se)};
-        m1 = {mirr(m0,m1.fi),mirr(m0,m1.se)};
-        m2 = {mirr(m0,m2.fi),mirr(m0,m2.se)};
+        auto m2_T = {mirr(m1,m2.fi),mirr(m1,m2.se)};         // 
+        auto m1_TT = {mirr(m0,m1.fi),mirr(m0,m1.se)};
+        auto m2_TT = {mirr(m0,m2.fi),mirr(m0,m2.se)};
+        auto 
+
+        cout << m0.fi.x << " " << m0.fi.y << " " << m0.se.x << " " << m0.se.y << "\n";
+        cout << m1.fi.x << " " << m1.fi.y << " " << m1.se.x << " " << m1.se.y << "\n";
+        cout << m2.fi.x << " " << m2.fi.y << " " << m2.se.x << " " << m2.se.y << "\n";
 
         lin t1 = {m0.fi,m1.fi};
         lin t2 = {m0.fi,m1.se};
         lin t3 = {m0.se,m1.fi};
         lin t4 = {m0.se,m1.se};
 
-        if(
-            ifAvil(t1, t2, m2) ||
-            ifAvil(t1, t3, m2) ||
+        // if( ifAvil(t1, t2, m2) ||
+        //     ifAvil(t1, t3, m2) ||
+        //     ifAvil(t1, t4, m2) ||
+        //     ifAvil(t2, t3, m2) ||
+        //     ifAvil(t2, t4, m2) ||
+        //     ifAvil(t3, t4, m2)
+        // ) {
+        //     cout << "Yes\n";
+        //     return;
+        // }
+        if( 
+            // ifAvil(t1, t2, m2) ||
+            // ifAvil(t1, t3, m2) ||
             ifAvil(t1, t4, m2) ||
-            ifAvil(t2, t3, m2) ||
-            ifAvil(t2, t4, m2) ||
-            ifAvil(t3, t4, m2)
+            ifAvil(t2, t3, m2)
+            // ifAvil(t2, t4, m2) ||
+            // ifAvil(t3, t4, m2)
         ) {
+            cout << ifAvil(t1, t4, m2) << " " << ifAvil(t2, t3, m2) << "\n";
             cout << "Yes\n";
             return;
         }
