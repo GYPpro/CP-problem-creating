@@ -228,23 +228,31 @@ void solve()
     iota(all(p),1);
     do{
         for(auto tx:p) cout << tx << " ";cout << "\n====\n";
+
         lin m0 = as[p[0]-1];
         lin m1 = as[p[1]-1];
         lin m2 = as[p[2]-1];
 
-        auto m2_T = {mirr(m1,m2.fi),mirr(m1,m2.se)};         // 
-        auto m1_TT = {mirr(m0,m1.fi),mirr(m0,m1.se)};
-        auto m2_TT = {mirr(m0,m2.fi),mirr(m0,m2.se)};
-        auto 
+        lin m2t = {mirr(m1,m2.fi),mirr(m1,m2.se)}; 
 
-        cout << m0.fi.x << " " << m0.fi.y << " " << m0.se.x << " " << m0.se.y << "\n";
-        cout << m1.fi.x << " " << m1.fi.y << " " << m1.se.x << " " << m1.se.y << "\n";
-        cout << m2.fi.x << " " << m2.fi.y << " " << m2.se.x << " " << m2.se.y << "\n";
+        // 规定直线m2t参数方程形式为 D = fi + k V; V = se-fi;
 
-        lin t1 = {m0.fi,m1.fi};
-        lin t2 = {m0.fi,m1.se};
-        lin t3 = {m0.se,m1.fi};
-        lin t4 = {m0.se,m1.se};
+        // 先判断m0和m1的位置关系
+        // 目标：m2t，排除：
+
+        // auto m2_T = {mirr(m1,m2.fi),mirr(m1,m2.se)};         // 
+        // auto m1_TT = {mirr(m0,m1.fi),mirr(m0,m1.se)};
+        // auto m2_TT = {mirr(m0,m2.fi),mirr(m0,m2.se)};
+        // auto 
+
+        // cout << m0.fi.x << " " << m0.fi.y << " " << m0.se.x << " " << m0.se.y << "\n";
+        // cout << m1.fi.x << " " << m1.fi.y << " " << m1.se.x << " " << m1.se.y << "\n";
+        // cout << m2.fi.x << " " << m2.fi.y << " " << m2.se.x << " " << m2.se.y << "\n";
+
+        // lin t1 = {m0.fi,m1.fi};
+        // lin t2 = {m0.fi,m1.se};
+        // lin t3 = {m0.se,m1.fi};
+        // lin t4 = {m0.se,m1.se};
 
         // if( ifAvil(t1, t2, m2) ||
         //     ifAvil(t1, t3, m2) ||
@@ -256,18 +264,18 @@ void solve()
         //     cout << "Yes\n";
         //     return;
         // }
-        if( 
-            // ifAvil(t1, t2, m2) ||
-            // ifAvil(t1, t3, m2) ||
-            ifAvil(t1, t4, m2) ||
-            ifAvil(t2, t3, m2)
-            // ifAvil(t2, t4, m2) ||
-            // ifAvil(t3, t4, m2)
-        ) {
-            cout << ifAvil(t1, t4, m2) << " " << ifAvil(t2, t3, m2) << "\n";
-            cout << "Yes\n";
-            return;
-        }
+        // if( 
+        //     // ifAvil(t1, t2, m2) ||
+        //     // ifAvil(t1, t3, m2) ||
+        //     ifAvil(t1, t4, m2) ||
+        //     ifAvil(t2, t3, m2)
+        //     // ifAvil(t2, t4, m2) ||
+        //     // ifAvil(t3, t4, m2)
+        // ) {
+        //     cout << ifAvil(t1, t4, m2) << " " << ifAvil(t2, t3, m2) << "\n";
+        //     cout << "Yes\n";
+        //     return;
+        // }
     } while(next_permutation(all(p)));
     cout << "No\n";
 }
