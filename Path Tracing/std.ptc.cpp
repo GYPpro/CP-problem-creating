@@ -118,6 +118,93 @@ using F = Frac<int>;
 using dot = pair<F,F>;
 using lin = pair<dot,dot>;
 
+// using convexHull = vector<dot>;
+
+//Rotating_Calipers
+template<typename VALUE_TYPE>
+class Rotating_Calipers
+{
+public:
+    using pv = pair<VALUE_TYPE, VALUE_TYPE>;
+    using vec_pv = vector<pair<VALUE_TYPE, VALUE_TYPE>>;
+    vec_pv p;
+
+    static VALUE_TYPE cross(pv p1, pv p2, pv p0)
+    {
+        pv t1 = {p1.fi - p0.fi, p1.se - p0.se},
+           t2 = {p2.fi - p0.fi, p2.se - p0.se};
+        return t1.fi * t2.se - t1.se * t2.fi;
+    }
+
+    static VALUE_TYPE dis(const pv &p1,const pv &p2){
+        return (p1.fi - p2.fi) * (p1.fi - p2.fi) + (p1.se - p2.se) * (p1.se - p2.se);
+    };
+
+public:
+    
+    Rotating_Calipers() {}
+
+    Rotating_Calipers(vec_pv _A) {
+        build(_A);
+    }
+
+    void build(const vec_pv & _A) {
+        p = ConvexHull(_A);
+    }
+
+    static vec_pv ConvexHull(vec_pv A, VALUE_TYPE flag = 1)
+    {
+        int n = A.size();
+        if (n <= 2) return A; 
+        vec_pv ans(n * 2);
+        sort(A.begin(), A.end(),
+        [](pv a,pv b) -> bool {
+            if(fabs(a.fi - b.fi) < 1e-10)
+                return a.se < b.se;
+            else return a.fi < b.fi;}    );
+        int now = -1;
+        for (int i = 0; i < n; i++)
+        { // 维护下凸包
+            while (now > 0 && cross(A[i], ans[now], ans[now - 1]) < flag) now--;
+            ans[++now] = A[i];
+        }
+        int pre = now;
+        for (int i = n - 2; i >= 0; i--)
+        { // 维护上凸包
+            while (now > pre && cross(A[i], ans[now], ans[now - 1]) < flag) now--;
+            ans[++now] = A[i];
+        }
+        ans.resize(now);
+        return ans;
+    }
+
+    VALUE_TYPE getDiameter() {
+        int j = 1;
+        VALUE_TYPE ans = 0;
+        int m = p.size();
+        p.push_back(p[0]);
+        for(int i = 0;i < m;i ++)
+        {
+            while( cross(p[i+1],p[j],p[i]) > cross(p[i+1],p[j+1],p[i]) ) j = (j+1)%m;
+            ans = max(ans, max( dis(p[i],p[j]) , dis(p[i+1],p[j]) ) );
+        }
+        p.pop_back();
+        return ans;
+    }
+
+    VALUE_TYPE getPerimeter() {
+        VALUE_TYPE sum = 0;
+        p.pb(p[0]);
+        for(int i = 0;i < (int)p.size() - 1;i ++)
+        {
+            sum += sqrtl(dis(p[i],p[i+1]));
+        }
+        p.pop_back();
+        return sum;
+    }
+
+};
+
 F cross(dot a,dot b) {
     return a.x * b.y - a.y * b.x;
 }
@@ -150,7 +237,54 @@ bool onseg(lin l,dot p) {
     (min(l.fi.y,l.se.y) <= p.y && p.y <= max(l.fi.y,l.se.y)) ;
 };
 
-bool segIntTest(lin a,lin b) {
+
+dot linInt(lin a,lin b) {
+    F f = cross( dsc(b.se,b.fi),dsc(a.fi,b.fi) ) / cross(dsc(b.se,b.fi),dsc(a.fi,a.se));
+    auto [tx,ty] = dsc(a.se,a.fi);
+    return add(a.fi,{tx * f,ty * f});
+}
+
+template<class T> tuple<int, dot, dot> segInt(lin l1, lin l2) {
+    auto [s1, e1] = l1;
+    auto [s2, e2] = l2;
+    auto A = max(s1.x, e1.x), AA = min(s1.x, e1.x);
+    auto B = max(s1.y, e1.y), BB = min(s1.y, e1.y);
+    auto C = max(s2.x, e2.x), CC = min(s2.x, e2.x);
+    auto D = max(s2.y, e2.y), DD = min(s2.y, e2.y);
+    if (A < CC || C < AA || B < DD || D < BB) {
+        return {0, {}, {}};
+    }
+    if (sign(cross(e1 - s1, e2 - s2)) == 0) {
+        if (sign(cross(s2, e1, s1)) != 0) {
+            return {0, {}, {}};
+        }
+        F p1(max(AA, CC), max(BB, DD));
+        F p2(min(A, C), min(B, D));
+        if (!pointOnSegment(p1, l1)) {
+            swap(p1.y, p2.y);
+        }
+        if (p1 == p2) {
+            return {3, p1, p2};
+        } else {
+            return {2, p1, p2};
+        }
+    }
+    auto cp1 = cross(s2 - s1, e2 - s1);
+    auto cp2 = cross(s2 - e1, e2 - e1);
+    auto cp3 = cross(s1 - s2, e1 - s2);
+    auto cp4 = cross(s1 - e2, e1 - e2);
+    if (sign(cp1 * cp2) == 1 || sign(cp3 * cp4) == 1) {
+        return {0, {}, {}};
+    }
+    dot p = linInt(l1, l2);
+    if (sign(cp1) != 0 && sign(cp2) != 0 && sign(cp3) != 0 && sign(cp4) != 0) {
+        return {1, p, p};
+    } else {
+        return {3, p, p};
+    }
+}
+
+bool fastSegIntTest(lin a,lin b) {
     auto [s1,e1] = a;
     auto [s2,e2] = b;
     auto A = max(s1.x,e1.x),AA = min(s1.x,e1.x);
@@ -164,12 +298,6 @@ bool segIntTest(lin a,lin b) {
                       onseg(a,s2) || onseg(a,e2);
 
     return A >= CC && B >= DD && C >= AA && D >= BB && (flag_cross || flag_onseg); 
-}
-
-dot linInt(lin a,lin b) {
-    F f = cross( dsc(b.se,b.fi),dsc(a.fi,b.fi) ) / cross(dsc(b.se,b.fi),dsc(a.fi,a.se));
-    auto [tx,ty] = dsc(a.se,a.fi);
-    return add(a.fi,{tx * f,ty * f});
 }
 
 void input(lin &a) {
@@ -210,14 +338,38 @@ lin ext(lin lc) {
 
 bool ifAvil(lin vec1,lin vec2,lin seg) {
     if(inside(vec1, vec2, seg.fi) || inside(vec1, vec2, seg.se)) return 1;
-    if(segIntTest(ext(vec1), seg) || segIntTest(ext(vec2), seg)) return 1;
+    if(fastSegIntTest(ext(vec1), seg) || fastSegIntTest(ext(vec2), seg)) return 1;
     return 0;
-    // if(segIntTest( a, lin b))
+    // if(fastSegIntTest( a, lin b))
 }
 
 bool ifFstl(lin vec1,lin vec2,lin seg) {
     if(inside(vec1, vec2, seg.fi) && inside(vec1, vec2, seg.se)) return 1;
 
+}
+
+dot convexInt(vector<dot> ch,lin a) {
+    auto tmp = a;
+    tmp = ext(tmp);
+    swap(tmp.fi,tmp.se);
+    tmp = ext(tmp);
+
+    vector<dot> ints;
+    for(int i = 0;i < ch.size();i ++) {
+        auto [status,p1,p2] = segInt(tmp,lin(ch[i],ch[(i+1)%ch.size()] ) );
+        if(status == 1) {
+            return p1;
+        } else if(status == 2) {
+            ints.pb(p1);
+            ints.pb(p2);
+        } else if(status == 3) {
+            return p1;
+        }
+    }
+    // for(auto x:ch) {
+    //     auto [status,p,_] = segInt(tmp,x);
+
+    // }
 }
 
 void solve()
@@ -238,7 +390,7 @@ void solve()
         // 规定直线m2t参数方程形式为 D = fi + k V; V = se-fi;
 
         // 先判断m0和m1的位置关系
-        // 目标：m2t，排除：
+        // 目标：m2t所在直线。可行域：排除：线段m2，包含：线段m1
 
         // auto m2_T = {mirr(m1,m2.fi),mirr(m1,m2.se)};         // 
         // auto m1_TT = {mirr(m0,m1.fi),mirr(m0,m1.se)};
