@@ -1,9 +1,10 @@
 // #pragma GCC optimize(2)
 
-#include <algorithm>
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+#include <sstream>
+#include <vector>
 using namespace __gnu_pbds;
 using namespace std;
 using ord_set = tree<int, null_type, less<int>, rb_tree_tag,
@@ -108,9 +109,9 @@ struct Frac {
     friend std::ostream &operator<<(std::ostream &os, Frac x) {
         T g = std::gcd(x.num, x.den);
         if (x.den == g) {
-            return os << x.num / g;
+            return os << (int)(x.num / g);
         } else {
-            return os << x.num / g << "/" << x.den / g;
+            return os << (int)(x.num / g) << "/" << (int)(x.den / g);
         }
     }
 };
@@ -194,10 +195,101 @@ public:
         cout << (lc ? "[" : "(") << l << "," << r << (rc ? "]" : ")");
     }
 
+    string to_str() {
+        stringstream st;
+        st << (lc ? "[" : "(") << l << "," << r << (rc ? "]" : ")");
+        return st.str();
+    }
+
+    T left() const { return l; }
+    T right() const { return r; }
+
+
 private:
     T l, r;       // 区间左右端点
     bool lc, rc;  // 分别表示左、右端点是否闭合（true：闭区间，false：开区间）
 };
+
+template<typename T>
+class Intervals {
+public:
+    Intervals() {}
+
+    // 可通过 vector 初始化
+    Intervals(const vector<Interval<T>> &ivs) : intervals(ivs) {
+        sort(intervals.begin(), intervals.end(), [](const Interval<T> &a, const Interval<T> &b) {
+            return a.left() < b.left();
+        });
+    }
+
+    // 按“并”添加新区间：更新集合为集合和新区间的并集，
+    // 合并过程中保证新集合不重叠且有序
+    void addUnion(const Interval<T> &newInt) {
+        vector<Interval<T>> res;
+        Interval<T> cur = newInt;
+        bool inserted = false;
+        for (auto &iv : intervals) {
+            // iv 在 cur 左侧，无交集（注意边界接触情况）
+            if(iv.right() < cur.left() || (iv.right() == cur.left() && !iv.overlaps(cur))) {
+                res.push_back(iv);
+            }
+            // iv 在 cur 右侧，无交集
+            else if(cur.right() < iv.left() || (cur.right() == iv.left() && !iv.overlaps(cur))) {
+                if(!inserted) {
+                    res.push_back(cur);
+                    inserted = true;
+                }
+                res.push_back(iv);
+            }
+            // 存在交集或接触，合并成一个新区间
+            else {
+                cur = cur.unite(iv)[0];
+            }
+        }
+        if(!inserted)
+            res.push_back(cur);
+        sort(res.begin(), res.end(), [](const Interval<T> &a, const Interval<T> &b) {
+            return a.left() < b.left();
+        });
+        intervals = res;
+    }
+
+    // 按“交”添加新区间：更新集合为原集合中各区间与 newInt 的交集（无效交集将被丢弃）
+    void addIntersection(const Interval<T> &newInt) {
+        vector<Interval<T>> res;
+        for(auto &iv : intervals) {
+            Interval<T> inter = iv.intersect(newInt);
+            if(inter.valid())
+                res.push_back(inter);
+        }
+        intervals = res;
+    }
+
+    // 辅助：打印当前集合中所有区间
+    void print() const {
+        for (auto &iv : intervals) {
+            iv.print();
+            cout << " ";
+        }
+        cout << "\n";
+    }
+    string to_str()  {
+        stringstream st;
+        for (auto &iv : intervals) {
+            // iv.print();
+            // cout << " ";
+            st << iv.to_str();
+            st << " ";
+        }
+        // cout << "\n";
+        st << "\n";
+        return st.str();
+    }
+
+// private:
+    vector<Interval<T>> intervals;
+};
+
 
 template <typename TYPE_NAME,std::size_t N>
 class Vector {
@@ -223,19 +315,27 @@ public:
         std::copy(list.begin(), list.end(), data.begin());
     }
 
-    //拷贝构造
-    Vector(const Vector &other) {
-        std::copy(other.data.begin(), other.data.end(), data.begin());
+    // 拷贝构造
+    Vector(const Vector &other)
+      : data(other.data),  // copy the array
+        first(data[0]),    // bind first to our copied data
+        second(data[1])
+    {
     }
 
     // 移动构造函数
-    Vector(Vector &&other) noexcept {
-        std::move(other.data.begin(), other.data.end(), data.begin());
+    Vector(Vector &&other) noexcept
+      : data(std::move(other.data)),
+        first(data[0]),
+        second(data[1])
+    {
     }
-    // 移动赋值运算符
-    Vector& operator=(Vector &&other) noexcept {
+
+    // 赋值运算符
+    Vector& operator=(const Vector &other) {
         if (this != &other) {
-            std::move(other.data.begin(), other.data.end(), data.begin());
+            data = other.data;
+            // first and second already refer to data[0] and data[1], so nothing extra to do.
         }
         return *this;
     }
@@ -348,25 +448,28 @@ constexpr TYPE_NAME&& get(Vector<TYPE_NAME,N>&& vec) noexcept {
 using dot = Vector<F, 2>;
 using lin = pair<dot, dot>;
 
+using rg = Interval<F>;
+using rgs = Intervals<F>;
+
 // using convexHull = vector<dot>;
 
 //Rotating_Calipers
-template<typename VALUE_TYPE>
+// template<typename VALUE_TYPE>
 class Rotating_Calipers
 {
 public:
-    using pv = pair<VALUE_TYPE, VALUE_TYPE>;
-    using vec_pv = vector<pair<VALUE_TYPE, VALUE_TYPE>>;
+    using pv = dot;
+    using vec_pv = vector<dot>;
     vec_pv p;
 
-    static VALUE_TYPE cross(pv p1, pv p2, pv p0)
+    static F cross(pv p1, pv p2, pv p0)
     {
         pv t1 = {p1.fi - p0.fi, p1.se - p0.se},
            t2 = {p2.fi - p0.fi, p2.se - p0.se};
         return t1.fi * t2.se - t1.se * t2.fi;
     }
 
-    static VALUE_TYPE dis(const pv &p1,const pv &p2){
+    static F dis(const pv &p1,const pv &p2){
         return (p1.fi - p2.fi) * (p1.fi - p2.fi) + (p1.se - p2.se) * (p1.se - p2.se);
     };
 
@@ -382,14 +485,14 @@ public:
         p = ConvexHull(_A);
     }
 
-    static vec_pv ConvexHull(vec_pv A, VALUE_TYPE flag = 1)
+    static vec_pv ConvexHull(vec_pv A, F flag = 1)
     {
         int n = A.size();
         if (n <= 2) return A; 
         vec_pv ans(n * 2);
         sort(A.begin(), A.end(),
         [](pv a,pv b) -> bool {
-            if(fabs(a.fi - b.fi) < 1e-10)
+            if(a.fi == b.fi)
                 return a.se < b.se;
             else return a.fi < b.fi;}    );
         int now = -1;
@@ -408,9 +511,9 @@ public:
         return ans;
     }
 
-    VALUE_TYPE getDiameter() {
+    F getDiameter() {
         int j = 1;
-        VALUE_TYPE ans = 0;
+        F ans = 0;
         int m = p.size();
         p.push_back(p[0]);
         for(int i = 0;i < m;i ++)
@@ -422,18 +525,20 @@ public:
         return ans;
     }
 
-    VALUE_TYPE getPerimeter() {
-        VALUE_TYPE sum = 0;
-        p.pb(p[0]);
-        for(int i = 0;i < (int)p.size() - 1;i ++)
-        {
-            sum += sqrtl(dis(p[i],p[i+1]));
-        }
-        p.pop_back();
-        return sum;
-    }
+    // F getPerimeter() {
+    //     F sum = 0;
+    //     p.pb(p[0]);
+    //     for(int i = 0;i < (int)p.size() - 1;i ++)
+    //     {
+    //         sum += sqrtl(dis(p[i],p[i+1]));
+    //     }
+    //     p.pop_back();
+    //     return sum;
+    // }
 
 };
+
+using calipers = Rotating_Calipers;
 
 F cross(dot a,dot b) {
     return a.x * b.y - a.y * b.x;
@@ -449,7 +554,7 @@ F cross(dot a,dot b) {
 
 F cross(dot p1,dot p2,dot p0) {
     // return cross(dsc(p1,p0),dsc(p2,p0));
-    cross(p1-p0,p2-p0);
+    return cross(p1-p0,p2-p0);
 }
 
 int sign(int x) {
@@ -468,6 +573,10 @@ bool onseg(lin l,dot p) {
     (min(l.fi.y,l.se.y) <= p.y && p.y <= max(l.fi.y,l.se.y)) ;
 };
 
+bool onSameSide(dot p1, dot p2, lin vec) {
+    F val = cross(p1, vec.fi, vec.se) * cross(p2, vec.fi, vec.se);
+    return sign(val) == 1;
+}
 
 dot linInt(lin a,lin b) {
     // F f = cross( dsc(b.se,b.fi),dsc(a.fi,b.fi) ) / cross(dsc(b.se,b.fi),dsc(a.fi,a.se));
@@ -561,10 +670,16 @@ bool onLeft(dot p,lin vec) {
     return cross(vec.se,p,vec.fi) > 0;
 }
 
-bool inside(lin vec1,lin vec2,dot p) {
+bool inside(lin vec1,lin vec2,dot p) { // 在两向量夹角内部
     if(onLeft(vec2.se,vec1)) swap(vec1,vec2);
     // v1在v2的左边
     return onLeft(p,vec2) && ((!onLeft(p,vec1)) && !onseg(vec1,p));
+}
+
+bool ifAvil(lin vec1,lin vec2,dot p) {
+    lin seg = {vec1.fi,vec2.fi};
+    lin rseg = {vec2.fi,vec1.fi};
+    return inside(vec1,seg,p) && inside(vec2,rseg,p) && onSameSide(p, vec1.se,seg);
 }
 
 lin ext(lin lc) {
@@ -579,34 +694,88 @@ lin ext(lin lc) {
     return {lc.se,lc.se-vec};
 }
 
-bool ifAvil(lin vec1,lin vec2,lin seg) {
-    if(inside(vec1, vec2, seg.fi) || inside(vec1, vec2, seg.se)) return 1;
-    if(fastSegIntTest(ext(vec1), seg) || fastSegIntTest(ext(vec2), seg)) return 1;
-    return 0;
-    // if(fastSegIntTest( a, lin b))
+lin purExt(lin lc) {
+    auto vec =lc.fi-lc.se;
+    // int esp = min()
+    F esp(1e18);
+    if(vec.fi != F(0)) esp = min(F(esp),F(2e10)/abs(vec.fi));
+    if(vec.se != F(0)) esp = min(F(esp),F(2e10)/abs(vec.se));
+    assert(esp != 1e18);
+    vec = dot({vec.fi * esp,vec.se * esp});
+    return {lc.fi,lc.se-vec};
 }
 
-bool ifFstl(lin vec1,lin vec2,lin seg) {
-    if(inside(vec1, vec2, seg.fi) && inside(vec1, vec2, seg.se)) return 1;
+// bool ifAvil(lin vec1,lin vec2,lin seg) {
+//     if(inside(vec1, vec2, seg.fi) || inside(vec1, vec2, seg.se)) return 1;
+//     if(fastSegIntTest(ext(vec1), seg) || fastSegIntTest(ext(vec2), seg)) return 1;
+//     return 0;
+//     // if(fastSegIntTest( a, lin b))
+// }
 
-}
+// bool ifFstl(lin vec1,lin vec2,lin seg) {
+//     if(inside(vec1, vec2, seg.fi) && inside(vec1, vec2, seg.se)) return 1;
+    
+// }
 
-dot convexInt(vector<dot> ch,lin a) {
+F cacuParm(lin a,dot cx) {
+    auto tvec = cx-a.fi;
+    auto [vx,vy] = a.se-a.fi;
+    if(vx != F(0)) return cx.fi / vx;
+    else {
+        assert(vy != F(0));
+        return cx.se/vy;
+    }
+};
+
+rg convexInt(calipers cal,lin a) {
     auto tmp = a;
     tmp = ext(tmp);
     swap(tmp.fi,tmp.se);
     tmp = ext(tmp);
+    auto ch = cal.p;
+
+
 
     vector<dot> ints;
     for(int i = 0;i < ch.size();i ++) {
         auto [status,p1,p2] = segInt(tmp,lin(ch[i],ch[(i+1)%ch.size()] ) );
-        if(status != )
+        if(status != 0) {
+            ints.push_back(p1);
+        }
     }
+
+    assert(ints.size() <= 2);
+    if(ints.size() == 0) {
+        return rg(0,0,0,0);
+    }
+
+    if(ints.size() == 1) {
+        return rg(cacuParm(a,ints[0]),cacuParm(a,ints[0]));
+    }
+
+    auto d1 = cacuParm(a,ints[0]),d2 = cacuParm(a,ints[1]);
+    
+    if(d1 > d2) return rg(d2,d1,1,1);
+    else return rg(d1,d2,1,1);
     // for(auto x:ch) {
     //     auto [status,p,_] = segInt(tmp,x);
 
     // }
 }
+
+vector<lin> EDGES = {
+    {{-1e10,-1e10},{-1e10,1e10 }},
+    {{-1e10,1e10 },{1e10 ,1e10 }},
+    {{1e10 ,1e10 },{1e10 ,-1e10}},
+    {{1e10 ,-1e10},{-1e10,-1e10}}
+};
+
+vector<dot> VEGS = {
+    {1e10 ,1e10 },
+    {-1e10,1e10 },
+    {1e10 ,-1e10},
+    {-1e10,-1e10},
+};
 
 void solve()
 {
@@ -628,8 +797,90 @@ void solve()
         // 先判断m0和m1的位置关系
         // 目标：m2t所在直线。可行域：排除：线段m2，包含：线段m1
 
+        auto getConvex = [&](lin vec1,lin vec2) -> calipers{
+            vec1 = ext(vec1),vec2 = ext(vec2);
+            if(fastSegIntTest(vec1, vec2)) {
+                auto [_,indot,_] = segInt(vec1, vec2);
+                return calipers(vector<dot>({vec1.fi,vec2.fi,indot}));
+            }
+            vector<dot> covs;
+            for(auto veg:VEGS) {
+                if(ifAvil(vec1, vec2, veg)) covs.push_back(veg);
+            }
+            covs.push_back(vec1.fi);
+            covs.push_back(vec1.se);
+            covs.push_back(vec2.fi);
+            covs.push_back(vec2.se);
+            return calipers(covs);
+        };  
 
+        // INSIDE 凹包 - COMMON 凸包
 
+        auto checkIfUnCommon = [&](lin tar) -> bool {
+            return 
+            fastSegIntTest(
+                {m0.fi,tar.fi}, 
+                ext({m0.se,tar.se})) && 
+            fastSegIntTest(
+                {m0.fi,tar.se}, 
+                ext({m0.se,tar.fi})
+            );
+        };
+        // bool ifCommon = fastSegIntTest({m0.fi,}, lin b)
+        
+        // 从 M0 出发 穿过 M1 交在 M2T
+        //=========计算包含M1的可行域=========//
+        rgs avilRgs,unvilRgs;
+        
+        if(checkIfUnCommon(m1)) { // INSIDE
+            avilRgs.addUnion(
+                convexInt(getConvex(
+                    {m0.fi,m1.fi},  {m0.se,m1.fi})
+                    , m2t) );
+            avilRgs.addUnion(
+                convexInt(getConvex(
+                    {m0.fi,m1.se},  {m0.se,m1.se})
+                    , m2t) );
+
+        } else {
+            avilRgs.addUnion(
+                convexInt(getConvex(
+                    {m0.fi,m1.se},  {m0.se,m1.fi})
+                    , m2t) );
+            avilRgs.addUnion(
+                convexInt(getConvex(
+                    {m0.fi,m1.fi},  {m0.se,m1.se})
+                    , m2t) );
+        }
+
+        // 从 M0 出发 穿过 M2 交在 M2T
+        // 这是会撞上M2原像的不可行域
+        if(checkIfUnCommon(m2)) {
+            // 不存在不可行域
+        } else {
+            unvilRgs.addUnion(
+                convexInt(getConvex(
+                    {m0.fi,m1.se},  {m0.se,m1.fi})
+                    , m2t) );
+            unvilRgs.addIntersection(
+                convexInt(getConvex(
+                    {m0.fi,m1.fi},  {m0.se,m1.se})
+                    , m2t) );
+        }
+
+        // rgs tar = vector<rg>({rg(F(0),F(1))});
+
+        // rg tar(F(0),F(1));
+        rg tar(cacuParm(m2t, m2t.fi),cacuParm(m2t, m2t.se));
+        avilRgs.addIntersection(tar);
+        unvilRgs.addIntersection(tar);
+        for(auto prg:avilRgs.intervals) {
+            unvilRgs.addIntersection(prg);
+        }
+
+        if(unvilRgs.to_str() == avilRgs.to_str()) 
+            cout << "NO\n";
+        else cout << "YESv\n";
 
         // auto m2_T = {mirr(m1,m2.fi),mirr(m1,m2.se)};         // 
         // auto m1_TT = {mirr(m0,m1.fi),mirr(m0,m1.se)};
