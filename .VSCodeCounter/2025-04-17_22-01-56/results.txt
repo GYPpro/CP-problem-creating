@@ -1,0 +1,69 @@
+Date : 2025-04-17 22:01:56
+Directory : /home/ubuntu/gits/CP-problem-creating
+Total : 33 files,  7424 codes, 857 comments, 1110 blanks, all 9391 lines
+
+Languages
++--------------+------------+------------+------------+------------+------------+
+| language     | files      | code       | comment    | blank      | total      |
++--------------+------------+------------+------------+------------+------------+
+| C++          |         16 |      5,253 |        804 |        917 |      6,974 |
+| JSON         |          5 |      1,711 |          0 |          5 |      1,716 |
+| Markdown     |          8 |        280 |          6 |        158 |        444 |
+| Python       |          2 |        166 |         33 |         25 |        224 |
+| Shell Script |          1 |         12 |         14 |          5 |         31 |
+| XML          |          1 |          2 |          0 |          0 |          2 |
++--------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                             | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                |         33 |      7,424 |        857 |      1,110 |      9,391 |
+| . (Files)                                                                                        |          7 |      1,969 |        298 |        337 |      2,604 |
+| Deep Spinal-cord Signals Protocol                                                                |          5 |        917 |         23 |         64 |      1,004 |
+| Embrace the Solitude of Destiny                                                                  |          2 |         55 |          0 |         31 |         86 |
+| Imaginary Tree 1                                                                                 |         10 |      1,234 |         48 |        116 |      1,398 |
+| Path Tracing                                                                                     |          3 |        970 |        192 |        193 |      1,355 |
+| Path Tracing(Easy Vesion)                                                                        |          5 |      2,265 |        296 |        352 |      2,913 |
+| graph                                                                                            |          1 |         14 |          0 |         17 |         31 |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| filename                                                                                         | language     | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| /home/ubuntu/gits/CP-problem-creating/Deep Spinal-cord Signals Protocol/aiout.py                 | Python       |         67 |          5 |         12 |         84 |
+| /home/ubuntu/gits/CP-problem-creating/Deep Spinal-cord Signals Protocol/bruteforces.cpp          | C++          |         50 |         11 |         14 |         75 |
+| /home/ubuntu/gits/CP-problem-creating/Deep Spinal-cord Signals Protocol/gnc copy.ipynb           | JSON         |        679 |          0 |          1 |        680 |
+| /home/ubuntu/gits/CP-problem-creating/Deep Spinal-cord Signals Protocol/statements.md            | Markdown     |         38 |          3 |         27 |         68 |
+| /home/ubuntu/gits/CP-problem-creating/Deep Spinal-cord Signals Protocol/std.cpp                  | C++          |         83 |          4 |         10 |         97 |
+| /home/ubuntu/gits/CP-problem-creating/Embrace the Solitude of Destiny/statement.md               | Markdown     |         55 |          0 |         30 |         85 |
+| /home/ubuntu/gits/CP-problem-creating/Embrace the Solitude of Destiny/std.cpp                    | C++          |          0 |          0 |          1 |          1 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/A.gnc.cpp                                 | C++          |         88 |          3 |         11 |        102 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/A.std.cpp                                 | C++          |         79 |          6 |         12 |         97 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/checker.cpp                               | C++          |         27 |          0 |          5 |         32 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/generator.ipynb                           | JSON         |         41 |          0 |          1 |         42 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/gnc copy.ipynb                            | JSON         |        480 |          0 |          1 |        481 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/i.cpp                                     | C++          |        139 |          1 |          1 |        141 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/notet.svg                                 | XML          |          2 |          0 |          0 |          2 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/statment.md                               | Markdown     |         45 |          3 |         28 |         76 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/std.cpp                                   | C++          |        186 |         29 |         34 |        249 |
+| /home/ubuntu/gits/CP-problem-creating/Imaginary Tree 1/std_Imaginary Tree (StarRail Version).cpp | C++          |        147 |          6 |         23 |        176 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing(Easy Vesion)/checker.ipynb                    | JSON         |        405 |          0 |          1 |        406 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing(Easy Vesion)/frameworks.hpp                   | C++          |        656 |        101 |        118 |        875 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing(Easy Vesion)/gnc_data.cpp                     | C++          |        299 |         26 |         50 |        375 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing(Easy Vesion)/statement.md                     | Markdown     |         39 |          0 |         24 |         63 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing(Easy Vesion)/std.ptc.cpp                      | C++          |        866 |        169 |        159 |      1,194 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing/statement.md                                  | Markdown     |         35 |          0 |         22 |         57 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing/std.gpt.py                                    | Python       |         99 |         28 |         13 |        140 |
+| /home/ubuntu/gits/CP-problem-creating/Path Tracing/std.ptc.cpp                                   | C++          |        836 |        164 |        158 |      1,158 |
+| /home/ubuntu/gits/CP-problem-creating/README.md                                                  | Markdown     |          1 |          0 |          0 |          1 |
+| /home/ubuntu/gits/CP-problem-creating/a.cpp                                                      | C++          |        299 |         26 |         50 |        375 |
+| /home/ubuntu/gits/CP-problem-creating/draft.ipynb                                                | JSON         |        106 |          0 |          1 |        107 |
+| /home/ubuntu/gits/CP-problem-creating/draft.md                                                   | Markdown     |         53 |          0 |         10 |         63 |
+| /home/ubuntu/gits/CP-problem-creating/frameworks.hpp                                             | C++          |        656 |        101 |        118 |        875 |
+| /home/ubuntu/gits/CP-problem-creating/graph/statement.md                                         | Markdown     |         14 |          0 |         17 |         31 |
+| /home/ubuntu/gits/CP-problem-creating/test.cpp                                                   | C++          |        842 |        157 |        153 |      1,152 |
+| /home/ubuntu/gits/CP-problem-creating/test.sh                                                    | Shell Script |         12 |         14 |          5 |         31 |
+| Total                                                                                            |              |      7,424 |        857 |      1,110 |      9,391 |
++--------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
