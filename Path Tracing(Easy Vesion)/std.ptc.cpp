@@ -1129,7 +1129,7 @@ void solve()
         }
         else {
             cout << "Yes\n";
-            return;
+            // return;
         }
 
 }
@@ -1181,13 +1181,13 @@ signed main()
 #endif
     int T = 1;
     cin >> T;
-    if(T == 0) 
-    cout << "Yes\nNO\nWA\n";
+    // if(T == 0) 
+    // cout << "Yes\nNO\nWA\n";
+    // return 0;
     // T = 1;
     while(T--){
         // dl("TESTCASE" << T);
         solve();
     }
     // while(T--) test_Int();
-    return 0;
 }

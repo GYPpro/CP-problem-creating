@@ -200,8 +200,8 @@ signed main(){
         return {tx,ty};
     };
 
-    int falsdkjfa = gc.randi(1,100);
-    if(falsdkjfa >= 95) stus = "NO";
+    int falsdkfja = gc.randi(1, 100);
+    if(falsdkfja >= 95) stus = "NO";
     else stus = "YES";
 
     if(stus == "YES") {
