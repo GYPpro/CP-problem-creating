@@ -129,7 +129,7 @@ void solve(){
     vector<int> crt_a, crt_r;
 
     vector<pair<Matrix,int>> tf;
-    
+    __int128 tlcm = 1;
     while(k--) {
         int r;
         cin >> r;
@@ -138,6 +138,8 @@ void solve(){
         cin >> c1 >> c2;
         int m;
         cin >> m;
+        tlcm = lcm((__int128)m,tlcm);
+        assert(tlcm < 1e18);
         Matrix cmx(2,m);
 
         cin >> cmx.a[0][0] ;

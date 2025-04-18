@@ -3,6 +3,8 @@
 
 #include <bits/stdc++.h>
 #include <cassert>
+#include <numeric>
+#include <vector>
 using namespace std;
 #define int long long
 
@@ -138,7 +140,7 @@ signed main(){
     // 1/0;
     // assert(0);
     int key,pdicans,n;
-    cin >> key >> pdicans;
+    cin >> key >> pdicans >> n;
     generator gc(key);
     int ans = gc.randi(1,1e9);
 
@@ -148,6 +150,8 @@ signed main(){
     // cout << x1 << " " << x2 << "\n";
 // 
     int curLCM = 1;
+
+    vector<int> usd;
     
     Matrix tr = Matrix::identity(2, 2);
         // cout << tr.a[0][0] << " ";
@@ -176,9 +180,12 @@ signed main(){
     cout << K << " " << x1 << "\n";
     while(K--) {
         int m = prs[gc.randi(0,100)%prs.size()];
+
         while(
             lcm((__int128)m,(__int128)curLCM) > 1e18
-        ) m =  prs[gc.randi(0,100)%prs.size()];
+        ) m = usd[gc.randi(0,100)%usd.size()];
+        usd.push_back(m);
+        curLCM = lcm(m, curLCM);
         int r = gc.randi(1,1e9);
         cout << r << "\n";
         Matrix tp(2,m);
@@ -215,5 +222,5 @@ signed main(){
         // tre = mat_pow(, long long exp)
         
     }
-    
+    return 0;   
 }
