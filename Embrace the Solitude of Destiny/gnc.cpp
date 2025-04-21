@@ -4,6 +4,7 @@
 #include <bits/stdc++.h>
 #include <cassert>
 #include <numeric>
+#include <sstream>
 #include <vector>
 using namespace std;
 #define int long long
@@ -139,12 +140,15 @@ static const vector<int> prs= { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 , 20408189, 4
 signed main(){
     // 1/0;
     // assert(0);
+    // stringstream st;
     int key,pdicans,n;
     cin >> key >> pdicans >> n;
+    int CAP;
+    cin >> CAP;
     generator gc(key);
-    int ans = gc.randi(1,1e9);
+    int ans = gc.randi(1,CAP);
 
-    int x1 = gc.randi(1, 1e9);
+    int x1 = gc.randi(1, CAP);
     int x2 = pdicans;
 
     // cout << x1 << " " << x2 << "\n";
@@ -179,20 +183,21 @@ signed main(){
     int K = n;
     cout << K << " " << x1 << "\n";
     while(K--) {
-        int m = prs[gc.randi(0,100)%prs.size()];
+        // int m = prs[gc.randi(0,100)%prs.size()];
+        int m = gc.randi(1,CAP);
 
         while(
             lcm((__int128)m,(__int128)curLCM) > 1e18
         ) m = usd[gc.randi(0,100)%usd.size()];
         usd.push_back(m);
         curLCM = lcm(m, curLCM);
-        int r = gc.randi(1,1e9);
+        int r = gc.randi(1,n);
         cout << r << "\n";
         Matrix tp(2,m);
-        tp.a[0][0] = gc.randi(1, 1e9);
-        tp.a[0][1] = gc.randi(1, 1e9);
-        tp.a[1][0] = gc.randi(1, 1e9);
-        tp.a[1][1] = gc.randi(1, 1e9);
+        tp.a[0][0] = gc.randi(1, CAP);
+        tp.a[0][1] = gc.randi(1, CAP);
+        tp.a[1][0] = gc.randi(1, CAP);
+        tp.a[1][1] = gc.randi(1, CAP);
         // auto tt = tp;
         auto tre = tr;
         pvtrs.push_back({tp,r});
@@ -212,7 +217,9 @@ signed main(){
         //      <<  (mat_pow(tp, r)* tr).a[1][1] << "\n";
 
         auto [c1,c2] = cal(m);
-        cout << c1 % m << " " << c2%m << " " << m << "\n";
+        if(pdicans == -1) {
+            cout << gc.randi(1,1e9) << " " << gc.randi(1,1e9) << " " << m << "\n";
+        } else  cout << c1 % m << " " << c2%m << " " << m << "\n";
 
         cout << tp.a[0][0] << " "
              << tp.a[0][1] << " "

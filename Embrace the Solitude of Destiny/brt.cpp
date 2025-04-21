@@ -92,6 +92,10 @@ int binpow(int x, int y,int mod)
     }
     return res;
 }
+int inv(int x,int mod) {
+    return binpow(x,mod-2,mod);
+}
+
 int mul(int a, int b, int m) {
     return (__int128)a * b % m;
 }
@@ -102,15 +106,6 @@ int exgcd (int a,int b,int &x,int &y) {
     x = y, y = tp - a / b * y;
     return g;
 };
-
-int inv(int a,int mod) {
-    assert(gcd(a,mod) == 1);
-    int x,y;
-    exgcd(a,mod,x,y);
-    return (x % mod + mod) % mod;
-    // return binpow(x,mod-2,mod);
-}
-
 
 int EXCRT(vector<int> &r,vector<int> &a) { // === r (%a)
     int x, y, k;
@@ -133,7 +128,16 @@ void solve(){
     cin >> k >> x0;
     vector<int> crt_a, crt_r;
 
-    vector<pair<Matrix,int>> tf;
+    // vector<pair<Matrix,int>> tf;
+
+    struct ELTC {
+        int r;
+        Matrix tr;
+        int c1,c2,m;
+    };
+
+    vector<ELTC> elc;
+
     __int128 tlcm = 1;
     while(k--) {
         int r;
@@ -141,7 +145,6 @@ void solve(){
         // Matrix cmx(2,);
         int c1,c2;
         cin >> c1 >> c2;
-        // cout << c1 << " " << c2 << "\n";
         int m;
         cin >> m;
         tlcm = lcm((__int128)m,tlcm);
@@ -153,80 +156,15 @@ void solve(){
         cin >> cmx.a[1][0] ;
         cin >> cmx.a[1][1] ;
 
-        auto curTrs = Matrix::identity(2, m);
-        
-        for(auto [mat,cr]:tf){
-            mat.mod = m;
-            curTrs = mat_pow(mat, cr) * curTrs;
-        }
-
-        tf.push_back({cmx,r});
-
-        cmx = mat_pow(cmx, r);
-
-        curTrs = cmx * curTrs;
-
-        // cout << cmx << "\n";
-
-        int equa1 = x0 * curTrs.a[0][0],equb1 = curTrs.a[0][1];
-        int equa2 = x0 * curTrs.a[1][0],equb2 = curTrs.a[1][1];
-
-
-        int m1 = m,m2 = m;
-        // equa1 + equb1 * x === c1 % m
-        auto printEqu = [&]() {
-            std::cout << equa1 << " + " << equb1 << " *  x  === " << c1 << " ( mod " << m1 << ")\n";
-            std::cout << equa2 << " + " << equb2 << " *  x  === " << c2 << " ( mod " << m2 << ")\n";
-            cout << "---------\n";
-        };
-        // printEqu();
-
-
-        equa1 %= m,equa2 %= m,equb1 %= m,equb2 %= m;
-
-
-
-        c1 = (c1 + m - equa1)%m;
-        equa1 = 0;
-        c2 = (c2 + m - equa2)%m;
-        equa2 = 0;
-        // printEqu();
-
-        int g1 = gcd(m1,equb1);
-        if(c1%g1 != 0) {
-            cout << "-1\n";
-            return;
-        }
-        int g2 = gcd(m2,equb2);
-        if(c2%g2 != 0) {
-            cout << "-1\n";
-            return;
-        }
-        c1 /= g1,m1 /= g1,equb1 /= g1;
-        c2 /= g2,m2 /= g2,equb2 /= g2;
-        // printEqu();
-        assert(m1 != 0);
-        assert(m2 != 0);
-        c1 = (c1 * inv(equb1,m1)) % m1;
-        // cout << (equb1 * inv(equb1,m))% m;
-        equb1 = 1;
-        c2 = (c2 * inv(equb2,m2)) % m2;
-        // cout << ((equb2 * inv(equb2,m2))% m2) << "\n";
-        equb2 = 1;
-
-        // printEqu();
-
-        crt_a.push_back(c1),crt_a.push_back(c2);
-        crt_r.push_back(m1),crt_r.push_back(m2);
-
-        // transforms_before *= cmx;
-
+        elc.push_back({
+            r,cmx,c1,c2,m
+        });
     }
-    // for(int i = 0;i < crt_a.size();i ++) {
-    //     cout << crt_a[i] << " " << crt_r[i] << "\n";
-    // }
-    cout << EXCRT(crt_a,crt_r) << "\n";
 
+    auto check = [&](int x1) -> bool {
+        
+    };
+ 
 }
 
 signed main(){
